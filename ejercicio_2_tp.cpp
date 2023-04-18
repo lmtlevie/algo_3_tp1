@@ -9,7 +9,7 @@ using namespace std;
 
 
 int mod_bin_exp(int x, int y, int m) {
-    if(y==0){
+   /* if(y==0){
         return 1;
     }
     
@@ -20,9 +20,19 @@ int mod_bin_exp(int x, int y, int m) {
     }else{
         return (res*x)%m;
     }
+    */
+    
+    int res = 1;
+    while (y > 0) {
+        if (y % 2 == 1) {
+            res = (res * x) % m;
+        }
+        x = (x * x) % m;
+        y = y / 2;
+    }
+    return res;
     
 }
-
 
 
 int modulo(int val, int m){
