@@ -14,14 +14,14 @@ using namespace std;
 
 bool esSeguro(int num,vector<vector<int>>& matrix, vector<int>& acum_por_fila, vector<int>& acum_por_col,vector<int>& acum_diags, int row , int col){
     
-    int  numero_magico = (pow(matrix.size(),3) + matrix.size()) /2 ;
+    int  numero_magico = ((matrix.size()*matrix.size())*matrix.size() + matrix.size()) /2 ;
     
     
-    bool no_se_paso_limite =  !(acum_por_fila[row] + num > numero_magico  ||  acum_por_col[col] + num > numero_magico || acum_diags[0] > numero_magico || acum_diags[1] > numero_magico );
+    bool no_se_paso_limite =  !(acum_por_fila[row] + num > numero_magico  ||  acum_por_col[col] + num > numero_magico || ( row == col && acum_diags[0] + num > numero_magico) || ( (row + col == matrix.size()-1) && acum_diags[1] + num > numero_magico ) );
     
     
     
-    // ahora si estoy completando una fila o columna chequeo que este sea igual a la acumulación de la anterior fila/columna
+    // ahora si estoy completando una fila o columna chequeo que este sea igual al numero magico
     
     if( col == matrix.size()-1 && acum_por_fila[row] + num != numero_magico  ) {
         return false;
@@ -30,40 +30,25 @@ bool esSeguro(int num,vector<vector<int>>& matrix, vector<int>& acum_por_fila, v
         if( row == matrix.size()-1  && (  acum_por_col[col] + num != numero_magico  ) ){
         return false;
     }    
+    
+    // si estoy completando con el último elemento de la diagonal opuesta chequeo que suma el num magico
+    
+    if( row == matrix.size()-1 && col == 0  && (acum_diags[1] + num != numero_magico)){
+        return false;
+    }
+    
+        // si estoy completando con el último elemento de la diagonal principal chequeo que suma el num magico
+    
+    if( row == matrix.size()-1 && col == matrix.size()-1  && (acum_diags[0] + num != numero_magico)){
+        return false;
+    }
             
     return no_se_paso_limite;            
 
 }
 
 
-bool esCuadradoMagico(vector<vector<int>>& matrix, vector<int>& acum_fila, vector<int>& acum_col , vector<int>& acum_diags){
-    
-    int n = matrix.size();
-    int numero_magico = (pow(n,3) + n) /2;
-    
 
-    
-    
-    //chequeo que la columna principal sea el num magico
-    
-    if( acum_diags[0]!= numero_magico ){
-        return false;
-    }
-    
-    
-    
-    // chequeo que la columna opuesta es el num magico
-    
-     if( acum_diags[1] != numero_magico ){
-        return false;
-    }
-    
-    
-    return true;
-    
-    
-    
-}
 
 vector<int> siguiente_pos(int row, int col , int size){
     
@@ -88,29 +73,25 @@ if(k <= qty ){
 }
 
 
+// si ya resolví el llamado recursivo que resuelve el problema para la  posicion (i,j) entonces encontramos un cuadrado mágico
+// es decir, al insertar el ultimo elemento de la matríz cumplimos todos los chequeos.
 if( i == sol_parcial.size() ||  j == sol_parcial.size() ){
-   if( esCuadradoMagico(sol_parcial, acum_fila, acum_col , acum_diags) ) {
        qty++;
        
      if( k == qty){  
-       
-     //std::cout << " encontre hasta ahora : " << qty << " cuadrados magicos" <<std::endl;
-     
-     for (int i = 0; i < sol_parcial.size(); i++) {
-         for (int j = 0; j < sol_parcial.size(); j++) {
+          for (int i = 0; i < sol_parcial.size(); i++) {
+          for (int j = 0; j < sol_parcial.size(); j++) {
              std::cout << sol_parcial[i][j] << " ";
-         }
+          }
      cout << endl;
      }
      
 }
-   }
- 
-  
    return;
    
 }
 
+// caso general :
 for( int num : disponibles ){
     if( num == -1 ){
         continue;
@@ -131,7 +112,11 @@ for( int num : disponibles ){
         disponibles[num-1] = -1;
         int sig_fila = siguiente_pos(i,j,sol_parcial.size())[0];
         int sig_col = siguiente_pos(i,j,sol_parcial.size())[1];
+        
+        //llamado recursivo al siguiente problema
         cant_cuadrados_magicos(disponibles, sol_parcial , acum_fila, acum_col,acum_diags ,qty,k, sig_fila, sig_col);
+        
+         // deshago cambios en acumulados donde corresponda
         disponibles[num-1] = valor;
         acum_fila[i] = acum_fila[i] - valor;
         acum_col[j] = acum_col[j] - valor;
@@ -157,11 +142,11 @@ int main(){
    //int k;cin >> k;
    
    // numeros ordenoas de 1 a n cuadrado
-   vector<int> numeros(pow(n,2));
+   vector<int> numeros(n*n);
    iota(begin(numeros),end(numeros),1);
    
    //magico
-   int val = (pow(n,3) + n); // matriz vacia
+   int val = ( n*n*n + n); // matriz vacia
    int magico = val/2;
    
    //matriz vacia
@@ -183,16 +168,13 @@ int main(){
 
    cant_cuadrados_magicos(numeros, sol_parcial , acum_fila, acum_col, acum_diags, qty,k, 0, 0 );
    
+   // si no encontré más cuadrados mágicos que el k-esimo buscado, entonces no existe tal cuadrado mágico.
    if( qty < k ){
        std::cout<< -1 << endl;
    }
    
    return 0;
 }
-
-
-
-
 
 
 
