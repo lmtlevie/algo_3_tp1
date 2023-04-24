@@ -4,10 +4,6 @@
 #include <algorithm>
 using namespace std ;
 
-/*
-void counting_sort_t(vector<tuple<int,int,int>> &v){
-    vector<int> buckets(2*v.size(),0);
-}*/
 
 bool sort_t(tuple<int,int,int> &a,tuple<int,int,int> &b){
     return get<1>(a) < get<1>(b);
@@ -21,6 +17,66 @@ vector<int> f(vector<tuple<int,int,int>> &v,int actual,vector<int> &parcial){
         }
     }
     return parcial;
+}
+
+double promedio(vector<double> vec) {
+    double sum = 0;
+    for (int i = 0; i < vec.size(); i++) {
+        sum += vec[i];
+    }
+    double average = (double) sum / vec.size();
+    return average;
+}
+
+void print_tuple(tuple<int,int,int> t){
+    int x = get<0>(t);
+    int y = get<1>(t);
+    cout << "(" << x << "," << y << ") ";
+}
+
+
+void pruebas_empiricas(){
+    int n_max = 100;
+    vector<double> resultados(n_max);
+    for (int n = 1; n < n_max; ++n) {
+        cout << n << endl;
+        vector<double> res_n;
+        double t_max = 0;
+        vector<tuple<int,int,int>> entrada_max;
+
+        for (int s = 0; s <= 2*n; ++s) {
+
+            vector<tuple<int,int,int>> v;
+            for (int t = s+1; t <= 2*n; ++t) {
+                for (int i = 1; i <= n; i++) {
+                    tuple<int, int, int> x = make_tuple(s, t, i);
+
+                    v.push_back(x);
+
+                }
+            }
+            if(v.empty())continue;
+            vector<int> res;
+            res.push_back(get<2>(v[0]));
+            double t0 = clock();
+            f(v,0,res);
+            double t1 = clock();
+            double tiempo = (double(t1 - t0) / CLOCKS_PER_SEC);
+            res_n.push_back(tiempo);
+            if(tiempo > t_max){
+                t_max = tiempo;
+                entrada_max = v;
+            }
+
+        }
+        resultados[n] = promedio(res_n);
+        cout << "Promedio n=" << n << ": " << resultados[n] << endl;
+        cout << "Max n=" << n << ": " << t_max << " ";
+        for(auto x:entrada_max){
+            print_tuple(x);
+        }
+
+    }
 }
 
 int main(){
@@ -42,7 +98,5 @@ int main(){
     for (int value:res) {
         cout << value << " ";
     }
-
-
     return 0;
 }
