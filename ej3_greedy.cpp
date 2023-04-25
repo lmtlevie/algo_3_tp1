@@ -1,6 +1,8 @@
 #include <vector>
-#include <iostream>
 #include <tuple>
+#include <fstream>
+#include <iostream>
+
 #include <algorithm>
 using namespace std ;
 
@@ -36,9 +38,13 @@ void print_tuple(tuple<int,int,int> t){
 
 
 void pruebas_empiricas(){
-    int n_max = 100;
+    ofstream archivo("resultados.csv");
+    archivo << "n\ttiempo_prom\n";
+
+
+    int n_max = 150;
     vector<double> resultados(n_max);
-    for (int n = 1; n < n_max; ++n) {
+    for (int n = 20; n < n_max; n += 1) {
         cout << n << endl;
         vector<double> res_n;
         double t_max = 0;
@@ -54,29 +60,32 @@ void pruebas_empiricas(){
                     v.push_back(x);
 
                 }
-            }
-            if(v.empty())continue;
-            vector<int> res;
-            res.push_back(get<2>(v[0]));
-            double t0 = clock();
-            f(v,0,res);
-            double t1 = clock();
-            double tiempo = (double(t1 - t0) / CLOCKS_PER_SEC);
-            res_n.push_back(tiempo);
-            if(tiempo > t_max){
-                t_max = tiempo;
-                entrada_max = v;
+                if(v.empty())continue;
+                vector<int> res;
+                res.push_back(get<2>(v[0]));
+                double t0 = clock();
+                f(v,0,res);
+                double t1 = clock();
+                double tiempo = (double(t1 - t0) / CLOCKS_PER_SEC);
+                res_n.push_back(tiempo);
+                if(tiempo > t_max){
+                    t_max = tiempo;
+                    entrada_max = v;
+                }
+                v.clear();
+
             }
 
         }
         resultados[n] = promedio(res_n);
         cout << "Promedio n=" << n << ": " << resultados[n] << endl;
-        cout << "Max n=" << n << ": " << t_max << " ";
-        for(auto x:entrada_max){
-            print_tuple(x);
-        }
+        cout << "Max n=" << n << ": " << t_max << " " << endl;
+
+        archivo << n << "\t" << resultados[n]  << endl;
 
     }
+    archivo.close();
+
 }
 
 int main(){
