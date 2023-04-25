@@ -1,0 +1,5 @@
+Para cada ejercicio de debe compilar con
+   $ g++ <NOMBRE_EJ> -o <EJECUTABLE>
+
+Y luego ejecutarlo
+   $ ./<EJECUTABLE>
